@@ -217,9 +217,39 @@ Response:
 
 Unrecognized breeds, colors and conditions are treated as `Other`, so any value in the shelter's format works.
 
-## Cloud deployment
+## Cloud deployment (AWS Elastic Beanstalk)
 
-_Coming soon._
+The Docker image is deployed to [AWS Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/), which builds the
+`Dockerfile` on an EC2 instance and exposes the service on a public URL. The EB command line tool (`awsebcli`) is
+included in the dev dependencies.
+
+Requires an AWS account and access keys (IAM user with Elastic Beanstalk permissions).
+
+```bash
+pipenv shell
+
+# Create the EB application (asks for AWS credentials the first time)
+eb init -p docker -r us-east-1 adoption-serving
+
+# Optional: build and run the image locally the same way EB will
+eb local run --port 9696
+
+# Create the environment: a single instance, no load balancer (~5-10 min)
+eb create adoption-serving-env --single
+
+# Test it: use the domain printed by `eb create` or shown by `eb status`
+python predict-test.py http://<your-eb-domain>/predict
+
+# Shut it down when finished
+eb terminate adoption-serving-env
+```
+
+`.ebignore` keeps the data and notebook out of the upload; EB only needs the Dockerfile, Pipfile(s), `train.py`,
+`predict.py` and `model.bin`.
+
+### Deployed service in action
+
+![Prediction request to the service running on Elastic Beanstalk](images/eb-deployment.png)
 
 ## Limitations
 

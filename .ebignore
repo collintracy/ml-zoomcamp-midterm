@@ -1,0 +1,9 @@
+# Files Elastic Beanstalk should NOT upload.
+# The service only needs: Dockerfile, Pipfile, Pipfile.lock, train.py, predict.py, model.bin
+.git
+.venv
+data
+*.ipynb
+.ipynb_checkpoints
+__pycache__
+*.png
